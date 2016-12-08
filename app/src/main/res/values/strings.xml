@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">PodoRun</string>
-    <string name="title_activity_main2">Main2Activity</string>
+    <string name="app_name" translatable="false">PodoRun</string>
+    <string name="error_permission">Error, permission denied, close PodoRun</string>
 </resources>
