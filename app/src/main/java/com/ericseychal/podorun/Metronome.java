@@ -44,7 +44,6 @@ public class Metronome {
     }
 
     public void play() {
-        calcSilence();
         double[] tick =
                 audioGenerator.getSineWave(this.tick, 8000, beatSound);
         double[] tock =
@@ -54,6 +53,7 @@ public class Metronome {
         int t = 0,s = 0,b = 0;
         do {
             for(int i=0;i<sound.length&&play;i++) {
+                calcSilence();
                 if(t<this.tick) {
                     if(b == 0)
                         sound[i] = tock[t];
@@ -79,5 +79,9 @@ public class Metronome {
     public void stop() {
         play = false;
         audioGenerator.destroyAudioTrack();
+    }
+
+    public void setBpm(double bpm) {
+        this.bpm = bpm;
     }
 }
