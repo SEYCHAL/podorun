@@ -1,17 +1,15 @@
-package com.ericseychal.podorun;
+package com.ericseychal.podorunwear;
 
 import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
+import android.app.Activity;
 import android.location.Location;
-import android.location.LocationManager;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,9 +20,8 @@ import com.xavierbauquet.theo.Theo;
 import com.xavierbauquet.theo.annotations.location.AccessCoarseLocation;
 import com.xavierbauquet.theo.annotations.location.AccessFineLocation;
 
-import static com.ericseychal.podorun.R.styleable.WheelView;
+public class MainActivity extends Activity {
 
-public class MainActivity extends AppCompatActivity {
     final double BPM_WHEEL = 40;
 
     private double bpmWheel;
@@ -32,41 +29,31 @@ public class MainActivity extends AppCompatActivity {
     private WheelView wheelView;
     private ImageView circle;
     private LaunchAsyncMetronome launchAsyncMetronome;
-    private FloatingActionButton fab;
+    private Button fab;
     private boolean buttonIo = true;
     private float reserveAngle;
     private float speed;
     LocationDroid locationDroid;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initWheel();
+        final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
+        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
+            @Override
+            public void onLayoutInflated(WatchViewStub stub) {
+                initWheel(stub);
+            }
+        });
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (Theo.isPermissionGranted(this,Manifest.permission.ACCESS_FINE_LOCATION)) {
-            location();
-        } else {
-            autorisation();
-        }
-
-    }
-
-    @Override
-    protected void onStop() {
-        locationDroid.stop();
-        super.onStop();
-    }
-
-    private void initWheel() {
+    private void initWheel(View view) {
         bpmWheel = BPM_WHEEL;
         wheelView = (WheelView) findViewById(R.id.wheelview);
         counter = (TextView) findViewById(R.id.counter);
-        fab = (FloatingActionButton) findViewById(R.id.button_io);
+        fab = (Button) findViewById(R.id.button_io);
         circle = (ImageView) findViewById(R.id.cicle);
 
         counter.setTextSize(30);
@@ -85,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,9 +80,11 @@ public class MainActivity extends AppCompatActivity {
                     wheelView.setAngle(reserveAngle);
                     launchAsyncMetronome = new LaunchAsyncMetronome(bpmWheel);
                     launchAsyncMetronome.execute();
+                    fab.setText("Stop");
                 } else {
                     launchAsyncMetronome.stop();
                     launchAsyncMetronome = null;
+                    fab.setText("Start");
                 }
                 buttonIo = !buttonIo;
             }
@@ -113,44 +103,37 @@ public class MainActivity extends AppCompatActivity {
     @AccessFineLocation
     @SuppressWarnings("MissingPermission")
     private void location() {
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            counter.setText(getResources().getString(R.string.error_permission));
-//            return;
-//        LocationManager
-//                GPS
-//        }
+        locationDroid = new LocationDroid(this) {
+            @Override
+            public void onNewLocation(Location location) {
+                speed = location.getSpeed();
+                showCounter();
+            }
 
-            locationDroid = new LocationDroid(this) {
-                @Override
-                public void onNewLocation(Location location) {
-                    speed = location.getSpeed();
-                    showCounter();
-                }
+            @Override
+            public void onProviderEnabled(String s) {
 
-                @Override
-                public void onProviderEnabled(String s) {
+            }
 
-                }
+            @Override
+            public void onProviderDisabled(String s) {
 
-                @Override
-                public void onProviderDisabled(String s) {
+            }
 
-                }
+            @Override
+            public void serviceProviderStatusListener(String s, int i, Bundle bundle) {
 
-                @Override
-                public void serviceProviderStatusListener(String s, int i, Bundle bundle) {
-
-                }
-            };
+            }
+        };
 
 //        locationDroid.setMaxTimeBetweenUpdates(10f);
 //        locationDroid.setDistanceBetweenUpdates(5f);
 
-            try {
-                locationDroid.start();
-            } catch (SecurityException s) {
-                Log.e("Permissions Error", s.toString());
-            }
+        try {
+            locationDroid.start();
+        } catch (SecurityException s) {
+            Log.e("Permissions Error", s.toString());
+        }
     }
 
     @AccessCoarseLocation
@@ -164,11 +147,12 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(requestCode == Theo.REQUEST_CODE) {
-            if (Theo.isPermissionGranted(this,Manifest.permission.ACCESS_FINE_LOCATION)) {
+            if (Theo.isPermissionGranted(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 location();
             } else {
                 counter.setText(getResources().getString(R.string.error_permission));
             }
         }
     }
+
 }

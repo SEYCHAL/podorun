@@ -1,1 +1,1 @@
-include ':app', ':podorunlibrary'
+include ':app', ':podorunlibrary', ':podorunwear'

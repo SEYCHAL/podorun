@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name" translatable="false">PodoRun</string>
+    <string name="error_permission">Error, permission denied, close PodoRun</string>
+</resources>
