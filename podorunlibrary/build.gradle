@@ -1,3 +1,11 @@
+plugins {
+    id "com.github.dcendents.android-maven" version "1.5"
+}
+
+group = GROUP
+version = PODORUN_VERSION
+
+
 apply plugin: 'com.android.library'
 
 android {

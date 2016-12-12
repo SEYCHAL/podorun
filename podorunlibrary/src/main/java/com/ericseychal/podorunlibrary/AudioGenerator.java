@@ -6,6 +6,7 @@ import android.media.AudioTrack;
 
 /**
  * Created by ericseychal on 06/12/2016.
+ * * Metronome created by MasterEx/BeatKeeper
  */
 
 public class AudioGenerator {

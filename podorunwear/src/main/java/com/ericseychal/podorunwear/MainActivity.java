@@ -26,6 +26,7 @@ public class MainActivity extends Activity {
 
     private double bpmWheel;
     private TextView counter;
+    private TextView bpm;
     private WheelView wheelView;
     private ImageView circle;
     private LaunchAsyncMetronome launchAsyncMetronome;
@@ -55,11 +56,13 @@ public class MainActivity extends Activity {
         counter = (TextView) findViewById(R.id.counter);
         fab = (Button) findViewById(R.id.button_io);
         circle = (ImageView) findViewById(R.id.cicle);
+        bpm = (TextView) findViewById(R.id.bpm);
 
         counter.setTextSize(30);
         reserveAngle = 0;
         speed = 0;
 //        circle.setBackgroundColor(getColor());
+        showCounter();
 
         wheelView.setOnWheelAngleChangeListener(new WheelView.OnWheelAngleChangeListener() {
             @Override
@@ -96,7 +99,8 @@ public class MainActivity extends Activity {
     }
 
     private void showCounter(){
-        counter.setText(String.format("%.2f", speed) + "\n Km/H\n" + String.format("%.1f", bpmWheel));
+        bpm.setText("\n\n\n\n\n" + String.format("%.1f", bpmWheel) + " bpm");
+        counter.setText(String.format("%.2f", speed) + "\n Km/H");
     }
 
     @AccessCoarseLocation
